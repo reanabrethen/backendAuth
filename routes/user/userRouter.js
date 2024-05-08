@@ -7,7 +7,12 @@ const {checkIsEmptyFunc} = require('./helpers/checkIsEmpty')
 const {authMiddlewareFunc} = require('./helpers/authMiddleware')
     // checkIsStrongPasswordFunc, checkIsEmailFunc, checkIsAlphaFunc, checkIsAlphanumericFunc, authMiddlewareFunc} = require('./helpers/authMiddleware')
 
-const {signUp, signIn, getUserById} = require('./controller/userController')
+const {signUp, signIn, getUserById, updateUser} = require('./controller/userController')
+
+const {checkJwtToken} = require('../utils/jwtMiddleware')
+
+
+
 
 router.get('/', (req, res)=>{
     res.json({message: 'connected to app'})
@@ -15,17 +20,24 @@ router.get('/', (req, res)=>{
 
 
 router.post('/sign-up', 
-checkIsUndefinedFunc, 
-checkIsEmptyFunc, 
+    checkIsUndefinedFunc, 
+    checkIsEmptyFunc, 
 // checkIsEmailFunc, 
 // checkIsStrongPasswordFunc,
 // checkIsAlphaFunc, 
 // checkIsAlphanumericFunc,
-authMiddlewareFunc,
-signUp)
+    authMiddlewareFunc,
+    signUp)
 
-router.post('/sign-in', checkIsUndefinedFunc, checkIsEmptyFunc, signIn)
+router.post('/sign-in', 
+        checkIsUndefinedFunc, 
+    checkIsEmptyFunc, 
+    signIn)
 
-router.get('/get-user-by-id/:id', getUserById)
+router.get('/get-user-by-id/:id', 
+    checkJwtToken, 
+    getUserById)
+
+router.put('/update-user', checkJwtToken, updateUser)
 
 module.exports = router

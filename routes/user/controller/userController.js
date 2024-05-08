@@ -115,18 +115,41 @@ async function signIn(req, res, next){
 async function getUserById(req, res, next){
   const {id} = req.params 
   try { 
-    const foundUser = await User.find({_id:id})   //findOne -->give obj instead of array; findById --> feed id in as string
-    res.json({message: "Successfully found User", foundUser})
-
-   } catch (error) {
+    const foundUser = await User.findOne({_id:id})   //find --> arr w/an object , findOne -->give obj instead of array; findById --> feed id in as string
+        if(!foundUser){
+            res.status(400).json({message: "No user found."})
+        }else{
+            res.json({message:"User found", payload: foundUser})
+        }
+    }catch (error) {
         res.json({messgae: "Error, unable to find User", error: error.message})
-   } 
-
+    } 
 }
+
+
+
+
+async function updateUser(req, res){
+    try {
+        const incomingData = req.body  //no need to destructure, only updating what is in the body
+        const {id} = res.locals.decodedJwt //stored and available from JWT middleware function
+        const updatedUser = await User.findByIdAndUpdate(id, incomingData, {new: true})
+        res.json({message: "user updated", payload: updatedUser})
+
+    } catch (error) {
+        res.status(500).json({message: 'failure', error: error.message})
+    }
+    
+    
+}
+
+
+
 
 
 module.exports = {
     signUp,
     signIn,
-    getUserById
+    getUserById,
+    updateUser
 }
